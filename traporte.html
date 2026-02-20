@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Transport - Oficial</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root { 
+            --brand-color: #12b0a6; 
+            --dark-bg: #111827;
+            --white: #ffffff;
+            --gold: #f1c40f;
+            --card-bg: #ffffff;
+            --text-main: #374151;
+            --border-color: rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+
+        /* --- ESTILOS LANDING PAGE --- */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000');
+            background-size: cover; height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; color: white; padding: 20px;
+        }
+        .btn-view-app {
+            background: var(--gold); color: black; padding: 20px 40px; border-radius: 50px;
+            font-weight: bold; font-size: 1.5rem; text-decoration: none; margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: 0.3s; cursor: pointer; border: none;
+        }
+        .info-section { padding: 80px 20px; text-align: center; background: white; }
+        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card-info { background: #f9fafb; padding: 30px; border-radius: 20px; width: 300px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        .faq-section { padding: 40px 20px; background: #f3f4f6; text-align: left; max-width: 1200px; margin: 0 auto; border-radius: 20px; margin-bottom: 40px;}
+        .faq-item { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ddd; }
+
+        /* CONTACTO ACTUALIZADO */
+        .contact-section { background: var(--dark-bg); color: white; padding: 60px 20px; text-align: center; }
+        .contact-details { margin: 20px 0; font-size: 1.1rem; line-height: 1.8; }
+        .btn-google { display: inline-block; background: white; color: black; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .btn-google:hover { background: var(--gold); }
+
+        /* --- ESTILOS APP --- */
+        #app-container { height: 100vh; display: flex; flex-direction: column; background: #f3f4f6; border-top: 5px solid var(--brand-color); overflow: hidden; }
+        @media (min-width: 768px) { #app-container { flex-direction: row; } }
+
+        .sidebar { width: 100%; max-width: 380px; background: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 5px 0 15px rgba(0,0,0,0.1); height: 100%; }
+        
+        .top-menu { display: flex; gap: 5px; margin-bottom: 15px; }
+        .btn-menu { flex: 1; padding: 8px 2px; border-radius: 8px; border: 1px solid var(--border-color); background: #f9fafb; font-size: 0.65rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        
+        .btn-garita-pro { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; position: relative; overflow: hidden; }
+        .btn-garita-pro:hover { background: #0369a1; color: white; }
+
+        .btn-sos { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+
+        .counter-badge { background: #e0f211; color: #111; padding: 8px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; text-align: center; margin-bottom: 15px; border: 1px solid #333; }
+        .card-app { background: var(--white); border: 1px solid var(--border-color); padding: 15px; border-radius: 14px; margin-bottom: 12px; }
+        .btn-search { width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--brand-color); color: white; font-weight: bold; cursor: pointer; }
+        .btn-search:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        .btn-pro-style { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #374151; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .comment-list { font-size: 0.8rem; max-height: 100px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #cbd5e1; }
+        .comment-item { margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 3px; }
+
+        .map-wrapper { flex-grow: 1; position: relative; height: 100%; }
+        #map { height: 100%; width: 100%; }
+
+        .blur-info { filter: blur(5px); opacity: 0.5; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1 style="font-size: 4rem; color: var(--brand-color);">Digital Transport</h1>
+        <p style="font-size: 1.2rem; max-width: 700px;">La evolución del transporte en Tijuana. Rutas, costos y seguridad en una sola App.</p>
+        <a href="#app-container" class="btn-view-app">VER APP FUNCIONAL</a>
+    </header>
+
+    <section class="info-section">
+        <div class="grid">
+            <div class="card-info"><h3>Rutas Exactas</h3><p>Taxis Rojos, Guindas y más.</p></div>
+            <div class="card-info"><h3>Modo PRO</h3><p>Desbloquea costos y tiempos reales.</p></div>
+            <div class="card-info"><h3>Seguridad</h3><p>Botón SOS integrado.</p></div>
+        </div>
+    </section>
+
+    <section class="faq-section">
+        <h2 style="text-align: center; margin-bottom: 20px;">Información Adicional</h2>
+        <div class="faq-item"><b>¿Qué son los créditos?</b> Son intentos de búsqueda gratuitos para usuarios nuevos.</div>
+        <div class="faq-item"><b>¿El modo PRO es permanente?</b> Sí, una vez activado desbloqueas todas las funciones de por vida.</div>
+        <div class="faq-item"><b>¿Cubre todo Tijuana?</b> Sí, desde Playas hasta el Florido y toda la Vía Rápida.</div>
+    </section>
+
+    <section class="contact-section">
+        <h2>Contáctanos</h2>
+        <div class="contact-details">
+            <p><b>Dirección:</b> Misión de San Javier 10643-400, Zona Urbana Río Tijuana, B.C. 22010</p>
+            <p><b>Teléfono:</b> +52 (664) 123-4567</p>
+            <p><b>Correo:</b> soporte@digitaltransport.com</p>
+        </div>
+        <a href="https://www.google.com/maps/search/Mision+de+san+javier+10643-400,+zona+urbana+rio+tijuana+bc+22010" target="_blank" class="btn-google">📍 VER EN GOOGLE MAPS</a>
+    </section>
+
+    <div id="app-container">
+        <aside class="sidebar">
+            <div class="top-menu">
+                <button class="btn-menu" onclick="toggleDarkMode()">🌙 NOCHE</button>
+                <button class="btn-menu btn-garita-pro" onclick="alert('San Ysidro: 40m\nOtay: 25m\nEstatus: Fluido')">🌉 GARITAS</button>
+                <button class="btn-menu" onclick="alert('Digital Transport V4.0\nTijuana, B.C.')">ℹ️ INFO</button>
+                <button class="btn-menu btn-sos" onclick="alert('🚨 SEÑAL SOS ENVIADA A CENTRAL')">🆘 SOS</button>
+            </div>
+
+            <h1 style="color: var(--brand-color); font-size: 1.5rem; margin-bottom: 10px;">Digital Transport</h1>
+            <div id="status-badge" class="counter-badge">⚡ Créditos: <span id="creditos-num">3</span></div>
+
+            <div class="card-app">
+                <h3 style="font-size: 0.75rem; color: var(--brand-color); margin-bottom: 10px;">TRAZAR RUTA</h3>
+                <input type="text" id="origenInput" placeholder="📍 Origen (Ej: Tomas Aquino, Natura...)" style="width:100%; padding:10px; margin-bottom:8px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="destinoInput" placeholder="🏁 Destino" style="width:100%; padding:10px; margin-bottom:8px; border-radius:8px; border:1px solid #ddd;">
+                <button class="btn-search" id="btnBusqueda" onclick="playClick(); buscarRuta()">BUSCAR</button>
+                <p id="msg-no-carga" style="color: red; font-size: 0.7rem; font-weight: bold; margin-top: 5px; display: none;">YA NO TIENES CARGA, ACTIVA EL PRO</p>
+            </div>
+
+            <div class="card-app">
+                <h3>Detalles</h3>
+                <p>🚌 Unidad: <span id="val-ruta" style="font-weight:bold; color: var(--brand-color);">--</span></p>
+                <p>🕒 Tiempo: <span id="val-tiempo" class="blur-info">-- min</span></p>
+                <p>💵 Costo: <span id="val-costo" class="blur-info">-- pesos</span></p>
+                <div id="pro-banner">
+                    <button class="btn-pro-style" onclick="playPro(); activarPro()">ACTIVAR PRO 💎</button>
+                </div>
+            </div>
+
+            <div class="card-app">
+                <h3 style="font-size: 0.75rem; color: var(--brand-color);">REPORTE COMUNIDAD</h3>
+                <input type="text" id="userComment" placeholder="¿Cómo está el tráfico?" style="width:100%; padding:8px; margin-top:5px; border-radius:8px; border:1px solid #ddd; font-size:0.8rem;">
+                <button onclick="addComment()" style="width:100%; margin-top:5px; padding:5px; background:#e2e8f0; border:none; border-radius:5px; cursor:pointer; font-size:0.7rem; font-weight:bold;">PUBLICAR</button>
+                <div class="comment-list" id="commentList">
+                    <div class="comment-item"><b>Admin:</b> Todo despejado en la 5 y 10.</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="map-wrapper">
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <script>
+        let creditos = 3;
+        let esPro = false;
+
+        const sndClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        const sndPro = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+        function playClick() { sndClick.play(); }
+        function playPro() { sndPro.play(); }
+
+        const redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        const blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+
+        var map = L.map('map', { zoomControl: false }).setView([32.5149, -117.0382], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        let markerA, markerB, routeLine;
+        
+        // --- BASE DE DATOS CON TOMAS AQUINO Y RUTAS EXACTAS ---
+        const puntosTJ = { 
+            "centro": { n: "Centro", lat: 32.535, lon: -117.038, r: "Taxi Rojo", t: "15", c: "15" }, 
+            "otay": { n: "Otay", lat: 32.532, lon: -116.942, r: "Taxi Guinda", t: "25", c: "15" },
+            "playas": { n: "Playas", lat: 32.531, lon: -117.119, r: "Taxi Azul", t: "20", c: "18" },
+            "postal": { n: "La Postal", lat: 32.528, lon: -117.013, r: "Taxi Blanco/Negro", t: "12", c: "15" },
+            "refugio": { n: "El Refugio", lat: 32.461, lon: -116.828, r: "Taxi Blanco/Naranja", t: "45", c: "20" },
+            "nino": { n: "El Niño", lat: 32.445, lon: -116.800, r: "Taxi Blanco/Naranja", t: "55", c: "22" },
+            "insurgente": { n: "Insurgentes", lat: 32.502, lon: -116.921, r: "Taxi Rojo/Negro", t: "30", c: "15" },
+            "rio": { n: "Plaza Río", lat: 32.523, lon: -117.021, r: "Taxi Guinda", t: "10", c: "15" },
+            "aeropuerto": { n: "Aeropuerto", lat: 32.544, lon: -116.976, r: "Taxi Dorado", t: "20", c: "18" },
+            "morita": { n: "La Morita", lat: 32.455, lon: -116.855, r: "Taxi Blanco/Negro", t: "50", c: "20" },
+            "urbi": { n: "Urbi", lat: 32.465, lon: -116.805, r: "Camión Urbano", t: "60", c: "16" },
+            "venados": { n: "Los Venados", lat: 32.440, lon: -116.890, r: "Taxi Blanco/Verde", t: "45", c: "18" },
+            "natura": { n: "Natura", lat: 32.395, lon: -116.915, r: "Camión Natura", t: "70", c: "18" },
+            "colorado": { n: "Cerro Colorado", lat: 32.505, lon: -116.910, r: "Taxi Blanco/Amarillo", t: "35", c: "15" },
+            "altiplano": { n: "Altiplano", lat: 32.500, lon: -116.865, r: "Taxi Blanco/Rojo", t: "40", c: "18" },
+            "tomas aquino": { n: "ITT Tomas Aquino", lat: 32.522, lon: -116.985, r: "Taxi Guinda/Verde", t: "15", c: "15" },
+            "tecnologico": { n: "ITT Tomas Aquino", lat: 32.522, lon: -116.985, r: "Taxi Guinda/Verde", t: "15", c: "15" }
+        };
+
+        async function buscarRuta() {
+            if(!esPro && creditos <= 0) return;
+            // Normalizar texto para que encuentre "Tomas Aquino" sin problemas
+            const ori = document.getElementById('origenInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const des = document.getElementById('destinoInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            let pA, pB;
+            for(let k in puntosTJ) { 
+                if(ori.includes(k)) pA = puntosTJ[k]; 
+                if(des.includes(k)) pB = puntosTJ[k]; 
+            }
+            
+            if(!pA || !pB) return alert("Usa: Tomas Aquino, Centro, Natura, Rio, etc.");
+
+            if(!esPro) {
+                creditos--;
+                document.getElementById('creditos-num').innerText = creditos;
+                if(creditos <= 0) {
+                    document.getElementById('btnBusqueda').disabled = true;
+                    document.getElementById('msg-no-carga').style.display = 'block';
+                }
+            }
+
+            if(markerA) map.removeLayer(markerA); if(markerB) map.removeLayer(markerB); if(routeLine) map.removeLayer(routeLine);
+            markerA = L.marker([pA.lat, pA.lon], {icon: redIcon}).addTo(map);
+            markerB = L.marker([pB.lat, pB.lon], {icon: blueIcon}).addTo(map);
+            
+            try {
+                // LLAMADA AL SERVIDOR PARA RUTA EXACTA POR CALLES
+                const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${pA.lon},${pA.lat};${pB.lon},${pB.lat}?overview=full&geometries=geojson`);
+                const data = await res.json();
+                
+                if(data.routes && data.routes.length > 0) {
+                    routeLine = L.polyline(data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]), {color: '#12b0a6', weight: 6}).addTo(map);
+                    map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
+                    
+                    document.getElementById('val-ruta').innerText = pB.r;
+                    document.getElementById('val-tiempo').innerText = pB.t + " min";
+                    document.getElementById('val-costo').innerText = pB.c + " pesos";
+                }
+            } catch (error) {
+                console.error("Error de ruta:", error);
+            }
+        }
+
+        function activarPro() {
+            esPro = true;
+            document.getElementById('status-badge').innerText = "Digital Transport PRO 💎";
+            document.getElementById('status-badge').style.background = "#fef3c7";
+            document.querySelectorAll('.blur-info').forEach(el => { el.style.filter = "none"; el.style.opacity = "1"; });
+            document.getElementById('pro-banner').style.display = 'none';
+            document.getElementById('btnBusqueda').disabled = false;
+            document.getElementById('msg-no-carga').style.display = 'none';
+            alert("¡MODO PRO ACTIVADO!");
+        }
+
+        function addComment() {
+            const input = document.getElementById('userComment');
+            if(input.value.trim() === "") return;
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<b>Tú:</b> ${input.value}`;
+            document.getElementById('commentList').prepend(item);
+            input.value = "";
+        }
+
+        function toggleDarkMode() {
+            const side = document.querySelector('.sidebar');
+            const isDark = side.style.background === 'rgb(17, 24, 39)';
+            side.style.background = isDark ? 'white' : '#111827';
+            side.style.color = isDark ? 'black' : 'white';
+        }
+    </script>
+</body>
+</html>
