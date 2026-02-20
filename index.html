@@ -18,6 +18,41 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
 
+        /* --- ESTILOS PANTALLA DE CARGA --- */
+        #loader-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #111827;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .loader-logo {
+            color: var(--brand-color);
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(18, 176, 166, 0.2);
+            border-top: 3px solid var(--brand-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         /* --- ESTILOS LANDING PAGE --- */
         .hero {
             background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000');
@@ -73,6 +108,11 @@
     </style>
 </head>
 <body>
+
+    <div id="loader-wrapper">
+        <div class="loader-logo">Digital Transport</div>
+        <div class="spinner"></div>
+    </div>
 
     <header class="hero">
         <h1 style="font-size: 4rem; color: var(--brand-color);">Digital Transport</h1>
@@ -151,6 +191,14 @@
     </div>
 
     <script>
+        // LÓGICA DE LA PANTALLA DE CARGA
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loader-wrapper');
+            setTimeout(() => {
+                loader.classList.add('loader-hidden');
+            }, 1500); // Se muestra por 1.5 segundos para dar look profesional
+        });
+
         let creditos = 3;
         let esPro = false;
 
@@ -167,7 +215,6 @@
 
         let markerA, markerB, routeLine;
         
-        // --- BASE DE DATOS CON TOMAS AQUINO Y RUTAS EXACTAS ---
         const puntosTJ = { 
             "centro": { n: "Centro", lat: 32.535, lon: -117.038, r: "Taxi Rojo", t: "15", c: "15" }, 
             "otay": { n: "Otay", lat: 32.532, lon: -116.942, r: "Taxi Guinda", t: "25", c: "15" },
@@ -190,7 +237,6 @@
 
         async function buscarRuta() {
             if(!esPro && creditos <= 0) return;
-            // Normalizar texto para que encuentre "Tomas Aquino" sin problemas
             const ori = document.getElementById('origenInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const des = document.getElementById('destinoInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             
@@ -216,7 +262,6 @@
             markerB = L.marker([pB.lat, pB.lon], {icon: blueIcon}).addTo(map);
             
             try {
-                // LLAMADA AL SERVIDOR PARA RUTA EXACTA POR CALLES
                 const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${pA.lon},${pA.lat};${pB.lon},${pB.lat}?overview=full&geometries=geojson`);
                 const data = await res.json();
                 
@@ -262,5 +307,4 @@
         }
     </script>
 </body>
-
 </html>
